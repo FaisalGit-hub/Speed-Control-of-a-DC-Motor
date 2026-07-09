@@ -1,4 +1,4 @@
-# Closed-Loop Speed Control of a DC Machine Using Dual-Loop PI Controllers
+# Speed Control of a DC Motor
 
 ## Project Overview
 This repository contains a MATLAB/Simulink implementation for the precision speed regulation of a separately excited DC motor driven by a single-phase AC source via a fully controlled thyristor-based bridge rectifier. The system utilizes a nested, discrete **dual-loop cascaded PI control architecture** to decouple electrical and mechanical system dynamics, ensuring high-fidelity velocity tracking and robust current limiting under dynamic load torque conditions.
