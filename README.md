@@ -40,9 +40,4 @@ To prevent overcurrent damage and decouple fast electrical dynamics from slower 
 
 ---
 
-## How to Run
 
-1. **Clone the Repository:**
-   ```bash
-   git clone [https://github.com/yourusername/dc-machine-dual-loop-control.git](https://github.com/yourusername/dc-machine-dual-loop-control.git)
-   cd dc-machine-dual-loop-control
