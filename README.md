@@ -1,59 +1,69 @@
 # DC Motor Speed Control Using MATLAB/Simulink
 
-A closed-loop DC motor drive simulation using MATLAB/Simulink to study speed regulation, thyristor-based power conversion, and feedback control.
+A closed-loop DC motor drive simulation using MATLAB/Simulink, featuring a PI speed controller and a four-thyristor controlled converter.
 
 ## Overview
 
-DC motors are widely used in industrial drives because their speed can be controlled by adjusting the applied armature voltage. Closed-loop speed control continuously compares the actual motor speed with a reference value and adjusts the drive input to minimise the speed error.
+DC motors are widely used in industrial applications because their speed can be regulated by controlling the electrical power supplied to the motor. Closed-loop speed control continuously compares the actual motor speed with a reference value and adjusts the control input to minimise the speed error.
 
-This project models a thyristor-controlled DC motor drive in MATLAB/Simulink. The system incorporates a four-thyristor converter, a DC motor, speed feedback, and a control system that regulates the motor speed around a reference of 1400 RPM.
+This project models a **separately excited DC motor drive** using MATLAB/Simulink. The system incorporates a four-thyristor controlled converter, a PI speed controller, speed feedback, and a constant load torque.
 
-The simulation demonstrates the transient response of the motor, including initial overshoot and subsequent speed regulation.
+The simulation investigates the motor's transient response and reference-speed tracking, focusing on rise time, peak overshoot, settling time, and steady-state speed variations.
 
 ## Objectives
 
-- Model a DC motor drive using MATLAB/Simulink.
-- Implement closed-loop motor speed regulation.
-- Study thyristor-based power conversion for DC motor control.
+- Model a separately excited DC motor drive in MATLAB/Simulink.
+- Implement closed-loop speed regulation using a PI controller.
+- Study the operation of a four-thyristor controlled converter.
 - Analyse reference-speed tracking and transient response.
-- Observe overshoot and steady-state speed oscillations.
-- Understand the application of feedback control in electrical drives.
+- Evaluate rise time, maximum overshoot, and settling time.
+- Understand the role of feedback control in electrical drives.
 
 ## Simulink Model
 
-The complete drive system is modelled in MATLAB/Simulink. The block diagram shows the power converter, DC motor, speed feedback, reference input, and firing-pulse generation logic.
+The complete system is modelled in MATLAB/Simulink. The block diagram illustrates the power converter, DC motor, reference-speed input, feedback loop, and thyristor firing-pulse generation subsystem.
 
-![Simulink block diagram of the DC motor speed-control system](results/block_diagram.png)
+![MATLAB/Simulink block diagram of the DC motor speed-control system](results/block_diagram.png)
 
-**Key components of the model:**
+### Main Components
 
-- **Thyristor Converter (T1–T4):** Controls the power supplied to the DC motor through controlled rectification.
-- **DC Motor:** Converts electrical energy into mechanical rotational energy.
-- **Reference Speed:** Specifies the desired motor speed of 1400 RPM.
-- **Speed Feedback:** Provides the actual motor speed for comparison with the reference.
-- **Load Torque:** A load torque input of 15 is specified in the model; its unit depends on the motor block configuration.
-- **Gate Pulse Generation:** Produces the thyristor firing signals according to the implemented control logic.
+- **Thyristor Converter (T1–T4):** Controls the electrical power supplied to the motor through controlled rectification.
+- **Separately Excited DC Motor:** Converts electrical energy into mechanical rotational energy, with separate armature and field circuits.
+- **PI Speed Controller:** Processes the speed error to generate the control command.
+- **Reference Speed:** Specifies the desired operating speed of 1400 RPM.
+- **Speed Feedback:** Provides the measured motor speed for comparison with the reference.
+- **Load Torque:** A constant load torque input of 15 is applied during the simulation.
+- **Gate Pulse Generation:** Generates the thyristor firing signals according to the implemented control logic.
 - **Scope:** Displays the reference and actual motor speed.
 
-The feedback loop compares the reference and actual speed. The controller uses the resulting error to adjust the thyristor firing signals and regulate the motor speed.
+The feedback loop allows the controller to adjust the converter firing signals in response to speed deviations, helping the motor track the reference speed.
 
 ## Control Strategy
 
-### Closed-Loop Speed Control
+### PI Speed Control
 
-The speed error is defined as:
+The speed error is calculated as:
 
 $$
-e_\omega(t)=\omega_{\mathrm{ref}}(t)-\omega(t)
+e(t)=N_{\mathrm{ref}}(t)-N_{\mathrm{actual}}(t)
+$$
+
+The PI controller generates the control signal according to:
+
+$$
+u(t)=K_p e(t)+K_i\int_0^t e(\tau)\,d\tau
 $$
 
 **Where:**
 
-- **eω(t):** Speed error.
-- **ωref(t):** Reference motor speed.
-- **ω(t):** Actual motor speed.
+- **e(t):** Speed error.
+- **Nref:** Reference motor speed.
+- **Nactual:** Actual motor speed.
+- **u(t):** Controller output.
+- **Kp:** Proportional gain.
+- **Ki:** Integral gain.
 
-The controller processes the speed error and adjusts the converter firing signals to bring the motor speed closer to the reference value.
+The proportional term responds to the instantaneous speed error, while the integral term accumulates the error over time to improve steady-state accuracy.
 
 ### DC Motor Mathematical Model
 
@@ -78,80 +88,84 @@ $$
 The mechanical dynamics are:
 
 $$
-J\frac{d\omega(t)}{dt}+B_m\omega(t)=T_e(t)-T_L(t)
+J\frac{d\omega(t)}{dt}
++B_m\omega(t)=T_e(t)-T_L(t)
 $$
 
 **Where:**
 
 - **Va:** Armature voltage.
-- **ia:** Armature current.
 - **Ra:** Armature resistance.
 - **La:** Armature inductance.
+- **ia:** Armature current.
 - **Eb:** Back electromotive force.
 - **Ke:** Back-EMF constant.
-- **Te:** Electromagnetic torque.
 - **Kt:** Torque constant.
+- **ω:** Angular speed in radians per second.
 - **J:** Equivalent moment of inertia.
 - **Bm:** Viscous friction coefficient.
+- **Te:** Electromagnetic torque.
 - **TL:** Load torque.
 
-These equations describe the general behaviour of a separately excited DC motor. The exact model and parameters depend on the motor configuration used in Simulink.
+These equations describe the general behaviour of a separately excited DC motor. The actual parameter values depend on the motor block configuration used in Simulink.
 
 ## Simulation Results
 
 ### Closed-Loop Speed Response
 
-The following plot compares the reference motor speed with the actual motor speed over a 10-second simulation.
+The following plot compares the reference speed with the actual motor speed over a 10-second simulation.
 
 ![Closed-loop DC motor speed response showing reference and actual speed](results/speed_response.png)
 
-**Observations:**
+### Observations
 
 - The reference speed is maintained at **1400 RPM**.
-- The actual motor speed rises rapidly toward the reference value.
-- The response exhibits an initial overshoot, with the motor speed reaching approximately 1530 RPM.
-- Following the overshoot, the actual speed decreases toward the reference.
-- The motor speed remains close to 1400 RPM for the remainder of the simulation, with small persistent oscillations.
+- The actual motor speed rises rapidly toward the reference.
+- The maximum speed reaches **1524 RPM**, resulting in an overshoot of approximately **8.86%**.
+- After reaching the peak, the actual speed decreases toward the reference.
+- The response has an approximate rise time of **116 ms**.
+- The settling time is approximately **750 ms**.
+- Small oscillations remain visible around the reference speed during the remainder of the simulation.
 
-The response demonstrates successful reference-speed tracking, although the remaining oscillations indicate that the transient and steady-state performance could be investigated further through controller tuning.
+The response demonstrates reference-speed tracking under the specified operating conditions. The remaining oscillations provide an opportunity to investigate further PI controller tuning.
 
 ## Performance Evaluation
 
-The speed response can be evaluated using the following parameters:
-
-| Performance measure | Description |
+| Performance parameter | Result |
 |---|---|
-| Reference Speed | Desired motor speed of 1400 RPM. |
-| Peak Speed | Approximately 1530 RPM, estimated from the plotted response. |
-| Maximum Overshoot | Approximately 9.3%, estimated from the plot. |
-| Rise Time | Time required for the motor speed to rise toward the reference. |
-| Settling Time | Time required for the response to remain within a specified tolerance band. |
-| Steady-State Error | Difference between the reference speed and the final average motor speed. |
+| Reference speed | 1400 RPM |
+| Maximum speed | 1524 RPM |
+| Peak overshoot | 8.86% |
+| Rise time | 116 ms |
+| Settling time | Approximately 750 ms |
+| Controller | PI |
+| Motor type | Separately excited DC motor |
+| Load torque | Constant, set to 15 |
 
-The estimated overshoot is calculated as:
+The percentage overshoot is calculated as:
 
 $$
 M_p=\frac{N_{\max}-N_{\mathrm{ref}}}{N_{\mathrm{ref}}}\times100\%
 $$
 
-Using the approximate peak speed:
+Substituting the measured peak and reference speeds:
 
 $$
-M_p\approx\frac{1530-1400}{1400}\times100\%
+M_p=\frac{1524-1400}{1400}\times100\%
 $$
 
 $$
-M_p\approx9.3\%
+\boxed{M_p=8.86\%}
 $$
 
-The peak speed and overshoot are approximate visual estimates. More accurate values can be obtained from the simulation data. Since small oscillations persist in the plotted response, the settling time should be calculated using a defined tolerance band.
+The motor exhibits a rapid response, reaching its reference-speed region in approximately 116 ms and settling in approximately 750 ms. The settling-time value depends on the tolerance band used to define when the response has settled.
 
 ## Technologies Used
 
 - **MATLAB** — modelling and simulation.
 - **Simulink** — block-based system modelling.
 - **Power Electronics** — thyristor-based controlled rectification.
-- **Control Systems** — feedback-based speed regulation.
+- **Control Systems** — PI feedback control and speed regulation.
 - **Electrical Machines** — DC motor dynamics and drive operation.
 
 ## Requirements
@@ -172,13 +186,13 @@ The peak speed and overshoot are approximate visual estimates. More accurate val
 
 3. Open the Simulink model file included in the repository.
 
-4. Check the motor parameters, controller settings, reference speed, and load torque.
+4. Verify the motor parameters, PI controller gains, reference speed, and load torque.
 
 5. Run the simulation using the **Run** button or `Ctrl+T`.
 
-6. Observe the reference and actual motor speed through the Scope block.
+6. Observe the reference and actual motor speed using the Scope block.
 
-7. Experiment with the controller parameters and operating conditions to investigate their effects on speed regulation.
+7. Experiment with the PI controller gains and operating conditions to study their effects on the transient response.
 
 ## Repository Structure
 
@@ -191,26 +205,31 @@ Speed-Control-of-a-DC-Motor/
     └── speed_response.png
 ```
 
-Replace `[Simulink model file]` with the actual model filename in your repository. Ensure both result images are uploaded to the `results` folder with the exact filenames used in the Markdown image links.
+Replace `[Simulink model file]` with the actual model filename in your repository.
+
+Ensure both images are uploaded to the `results` folder using the exact filenames referenced in the README. GitHub will then display them automatically.
 
 ## Possible Extensions
 
-- Tune controller parameters to reduce overshoot and steady-state oscillations.
-- Investigate speed regulation under different load torque conditions.
+- Tune the PI controller gains to reduce overshoot and persistent oscillations.
+- Investigate speed regulation under varying load torque.
 - Analyse armature current and electromagnetic torque during acceleration.
-- Compare alternative speed-control strategies.
-- Evaluate the response using numerical performance metrics obtained from simulation data.
+- Compare different controller settings under identical operating conditions.
+- Calculate rise time, settling time, and steady-state error from exported simulation data.
 
 ## Conclusion
 
-This project demonstrates closed-loop DC motor speed control using a thyristor-based converter and MATLAB/Simulink. The simulated response shows that the motor approaches the 1400 RPM reference following an initial overshoot, with small oscillations persisting around the desired speed.
+This project demonstrates closed-loop speed control of a separately excited DC motor using a PI controller and a four-thyristor controlled converter in MATLAB/Simulink.
 
-The model provides a practical foundation for understanding electrical drive dynamics, controlled rectification, feedback control, and transient performance analysis.
+For a reference speed of 1400 RPM, the simulated motor response reaches a peak speed of 1524 RPM, corresponding to an overshoot of 8.86%. The response has a rise time of approximately 116 ms and a settling time of approximately 750 ms.
+
+The project provides practical experience in electrical drive modelling, power electronic conversion, feedback control, and transient-response analysis.
 
 ---
 
 **Project:** DC Motor Speed Control  
 **Platform:** MATLAB/Simulink  
-**Reference Speed:** 1400 RPM  
-**Power Converter:** Four-thyristor controlled converter  
-**Primary Analysis:** Closed-loop speed response
+**Motor:** Separately Excited DC Motor  
+**Controller:** PI  
+**Converter:** Four-Thyristor Controlled Converter  
+**Reference Speed:** 1400 RPM
